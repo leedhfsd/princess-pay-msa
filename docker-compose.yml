@@ -1,0 +1,89 @@
+version: "3.8"
+services:
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    networks:
+      - webnet
+    restart: always
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8765:8765"
+    depends_on:
+      - eureka-server
+    networks:
+      - webnet
+    restart: always
+
+  card:
+    build:
+      context: ./card
+      dockerfile: Dockerfile
+    container_name: card
+    ports:
+      - "${CARD_SERVICE_PORT}:8080"
+    networks:
+      - webnet
+    depends_on:
+      - eureka-server
+      - api-gateway
+      - card-mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://card-mysql:3306/card
+      - SPRING_DATASOURCE_USERNAME=carduser
+      - SPRING_DATASOURCE_PASSWORD=cardpass
+
+  payment:
+    build:
+      context: ./payment
+      dockerfile: Dockerfile
+    container_name: payment
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:8080"
+    networks:
+      - webnet
+    depends_on:
+      - eureka-server
+      - api-gateway
+      - payment-mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://payment-mysql:3306/payment
+      - SPRING_DATASOURCE_USERNAME=paymentuser
+      - SPRING_DATASOURCE_PASSWORD=paymentpass
+
+  store:
+    build:
+      context: ./store
+      dockerfile: Dockerfile
+    container_name: store
+    ports:
+      - "${STORE_SERVICE_PORT}:8080"
+    networks:
+      - webnet
+    depends_on:
+      - eureka-server
+      - api-gateway
+      - store-mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://store-mysql:3306/store
+      - SPRING_DATASOURCE_USERNAME=storeuser
+      - SPRING_DATASOURCE_PASSWORD=storepass
+
+networks:
+  webnet:
+    driver: bridge
+
+volumes:
+  card-db-data:
+  payment-db-data:
+  store-db-data:
