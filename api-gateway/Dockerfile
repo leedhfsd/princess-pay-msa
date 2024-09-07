@@ -1,5 +1,5 @@
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:17.0.1-jdk AS build
+FROM openjdk:17-jdk-alpine AS build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN chmod +x gradlew
 RUN ./gradlew build
 
 # Use a smaller base image for the final stage
-FROM openjdk:17.0.1-jdk
+FROM openjdk:17-jdk-alpine
 
 # Set the working directory in the container
 WORKDIR /app
