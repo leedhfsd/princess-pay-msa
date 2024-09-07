@@ -10,7 +10,6 @@ spring:
       name: store
       profile: ${SPRING_PROFILES_ACTIVE:local}
 
-
 #eureka:
 #  client:
 #    serviceUrl:
