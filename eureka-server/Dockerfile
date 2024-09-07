@@ -1,6 +1,6 @@
 # Use an official OpenJDK runtime as a parent image
 FROM openjdk:17.0.1-jdk AS build
-
+RUN apt-get update && apt-get install -y xargs
 # Set the working directory in the container
 WORKDIR /app
 
